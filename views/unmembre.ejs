@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<meta charset="utf-8">
+<%- include('composants/head') %>
+<body>
+<%- include('composants/menu') %>
+<%- include('composants/formulaire') %>
+<div id="global">
+	<h1><%= __("unMemb") %><%= unmembre[0].prenom %> <%= unmembre[0].nom %></h1>
+	<table class="tableau unmembre">
+		<tr>
+			<th>_id</th>
+			<th><%= __("nom")  %></th>
+			<th><%= __("prenom")  %></th>
+			<th><%= __("telephone")  %></th>
+			<th><%= __("courriel")  %></th>
+		</tr>
+		<tr>
+			<% for (p in unmembre[0]) { %>
+	 			<td contenteditable='true'><%= unmembre[0][p] %></td>
+	 		<% } %>
+	 		<td><a class="sauver" href="#"><%= __("modifier")  %></a></td>
+		</tr>
+	</table>
+	<!-- <button id='testAJAX'>test AJAX</button> -->
+</div>
+<%- include('composants/footer') %>
+<script type="text/javascript">
+
+//////////////////////////////////////////////////////////////////////////////////////	Modifier
+
+	let elmSauver = document.querySelectorAll('.sauver');
+	for (elm of elmSauver){
+		elm.addEventListener('click', function(){
+
+			xhr = new XMLHttpRequest();
+			xhr.open('POST', "/modifier", true);
+
+			let laLigne = this.parentNode.parentNode;
+			let id = laLigne.children[0].innerHTML;
+			let nom = laLigne.children[1].innerHTML;
+			let prenom = laLigne.children[2].innerHTML;
+			let telephone = laLigne.children[3].innerHTML;
+			let courriel = laLigne.children[4].innerHTML;
+
+			data = {
+				"_id" : id,
+				"nom" : nom,
+				"prenom" : prenom,
+				"telephone" : telephone,
+				"courriel" : courriel
+			}
+
+			console.log(data);
+			sData = JSON.stringify(data);
+			xhr.setRequestHeader('Content-type', 'application/json');
+			xhr.send(sData);
+			xhr.addEventListener("readystatechange", traiterRequest, false);
+		})
+	}
+
+	function traiterRequest(e){
+		console.log("xhr.readyState = " + xhr.readyState);
+		console.log("xhr.status = " + xhr.status);
+		if(xhr.readyState == 4 && xhr.status == 200) {
+			console.log('ajax fonctionne');
+			let  maReponse = JSON.parse(xhr.responseText);
+			console.log(xhr.responseText);
+			console.log(maReponse._id);
+		}
+	}
+</script>
+</body>
+</html>

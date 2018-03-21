@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<meta charset="utf-8">
+	<%- include('composants/head') %>
+	<body>
+	<%- include('composants/menu') %>
+		<div id="global">
+			<h1><%= __('clavardage') %></h1>
+			<section id="enregistrement">
+				<input type="text">
+				<button onclick="enregistrement()"><%= __('enregistrer') %></button>
+			</section>
+			<section id="chat" style="display:none">
+				<table id="list_user"></table>
+				<table id="message" style="border-collapse: collapse;"></table>
+				<section id="message_a_transmettre">
+					<input type="text" name="textMessage"><button onclick="envoieMsg()"><%= __('envoyer') %></button>
+				</section>
+			</section>
+
+		</div>
+	<%- include('composants/footer') %>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+		/* 
+		Pour établir une communication socket il faut un premier appel de
+		 la fonction io()
+		 Cette fonction est incluse dans la librairie socket.io. 
+		 Cette fonction déclenche un événement connect vers le serveur
+		 */
+		 window.onload = ()=>{
+			socket = io();
+
+			console.log(socket.id);
+
+			socket.on('connect', function(){
+				console.log('Le socket id = ' + socket.id); 
+
+				/*l'événement ackUser a été transmis par le serveur */ 
+				socket.on('valid_user', function(data){
+					console.log('data en provenance du serveur = ' + data.user);
+					let elmE = document.getElementById("enregistrement");
+					let elmC = document.getElementById("chat");
+					elmE.style.display = "none";
+					elmC.style.display = "flex";
+					elmC.style.flex = "column nowrap";
+					
+				});
+
+				socket.on('valid_message', function(data){
+					afficher_mon_message(data, "#0f0");
+					
+				});
+
+				///////////////////////////
+				socket.on('diffuser_list_user', function(data){
+					afficher_tab_user(data);
+				});
+
+				///////////////////////////
+				socket.on('diffuser_message', function(data){
+					afficher_mon_message(data, "#FFF");
+				});
+			});
+		 }
+
+		/* ---------------------------------------------------------- */
+
+		 function enregistrement(){
+ 
+			let elmUser = document.querySelector('#enregistrement input');
+			console.log(elmUser.value);
+			/* l'événement « setUser » est transmit avec un objet 
+			*/
+			socket.emit('setUser', {user : elmUser.value});
+		 }
+
+		 function envoieMsg(){
+	 
+			let elmMsg = document.querySelector('#message_a_transmettre input');
+	
+			/* l'événement « setMsg » est transmit avec un objet 
+			*/
+			socket.emit('setMsg', {msg : elmMsg.value});
+		 }
+
+		 function afficher_tab_user(data){
+		 	let sChaine = "";
+			for(p in data){
+				sChaine+="<tr><td>"+p+"</td><td>"+data[p]+"</td>";
+				let elmList = document.getElementById("list_user");
+				elmList.innerHTML = sChaine;
+			}
+	 	 }
+
+		 function afficher_mon_message(data, couleur){
+		 	let tabMsg = document.querySelector('#message');
+		 	let tr = document.createElement("tr");
+		 	let sChaine = "<td>"+data.user+"</td><td style = 'color : "+couleur+"'>"+data.msg+"</td>";
+
+		 	tr.innerHTML = sChaine;
+		 	tabMsg.appendChild(tr);
+		 }
+
+
+	</script>
+	</body>
+</html>

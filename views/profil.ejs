@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<meta charset="utf-8">
+	<%- include('composants/head') %>
+	<body>
+	<%- include('composants/menu') %>
+	<div id="global">
+		<h1><%= __('bienvenuRech') %></h1>
+		<p><%= __('instRech') %></p>
+		<form id="form_recherche" action="/profil/recherche" method="POST">
+			<input type="text" name="recherche" placeholder="<%= __('cherche') %>">
+			<button type="submit"><%= __('cherche') %></button>
+		</form>
+		<% if (membre != undefined){ %>
+			<% if (membre.length > 0) { %>
+			<table class="tableau tabrecherche">
+				<tr>
+					<th>_id</th>
+					<th><%= __("nom")  %></th>
+					<th><%= __("prenom")  %></th>
+					<th><%= __("telephone")  %></th>
+					<th><%= __("courriel")  %></th>
+				</tr>
+				<% for (var elm = 0; elm < membre.length; elm++){ %>
+				<tr>
+			 		<td><%= membre[elm]._id %></td>
+			 		<td><%= membre[elm].nom %></td>
+			 		<td><%= membre[elm].prenom %></td>
+			 		<td><%= membre[elm].telephone %></td>
+			 		<td><%= membre[elm].courriel %></td>
+				</tr>
+				<% } %>
+			</table>
+			<% } else { %>
+				<p><%= __("aucunMemb")  %></p>
+			<% } %>
+		<% } %>
+	</div>
+	<%- include('composants/footer') %>
+	</body>
+</html>
